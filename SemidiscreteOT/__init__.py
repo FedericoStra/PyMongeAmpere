@@ -14,7 +14,7 @@
 import sys
 import os
 
-import MongeAmpere as ma
+import SemidiscreteOT.MongeAmpere as ma
 import numpy as np
 import numpy.matlib
 import scipy as sp

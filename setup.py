@@ -1,15 +1,8 @@
 import sys
-
-try:
-    from setuptools import setup, Extension
-except ImportError:
-    print("It looks like you don't have setuptools installed.",
-          "I will not fall back using distutils.",
-          sep='\n', file=sys.stderr)
-    sys.exit(1)
+from setuptools import setup, Extension
 
 
-CFLAGS = ["-std=c++11", "-Wall", "-I/usr/include/eigen3/"]
+CFLAGS = ["-std=c++11", "-Wall"]
 
 
 def get_ext_modules():
@@ -23,13 +16,17 @@ def get_ext_modules():
 
     # Inject required options for extensions compiled against the Numpy
     # C API (include dirs, library dirs etc.)
-    np_compile_args = np_misc.get_info('npymath')
+    compile_args = np_misc.get_info('npymath')
+
+    compile_args['include_dirs'] += ["/usr/include/eigen3/"]
+    compile_args['libraries'] += ["boost_numpy", "gmp",
+        "CGAL", "CGAL_Core", "CGAL_ImageIO"]
 
     ext_mongeampere = Extension(
-        name="SemidiscreteOT.mongeampere",
+        name="SemidiscreteOT.MongeAmpere",
         sources=["SemidiscreteOT/MongeAmpere.cpp"],
         extra_compile_args=CFLAGS,
-        **np_compile_args)
+        **compile_args)
 
     ext_modules = [ext_mongeampere]
 
@@ -41,19 +38,19 @@ metadata = dict(
     description="Compute semidiscrete optimal transport",
     version="0.1",
 
-    author="Continuum Analytics, Inc.",
-    author_email="numba-users@continuum.io",
+    author="Federico Stra",
+    author_email="federico.stra@sns.it",
     url="http://github.com/FedericoStra/SemidiscreteOT",
 
     packages=['SemidiscreteOT'],
     ext_modules=get_ext_modules(),
 
-    setup_requires=['numpy'],
+    setup_requires=[],
     install_requires=['numpy'],
 
     license="GPL",
     classifiers=[
-        "Development Status :: 4 - Beta",
+        "Development Status :: 3 - Alpha",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: BSD License",
         "Operating System :: OS Independent",
@@ -61,7 +58,6 @@ metadata = dict(
         "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.4",
         "Programming Language :: Python :: 3.5",
-        "Topic :: Software Development :: Compilers",
         ],
     )
 
