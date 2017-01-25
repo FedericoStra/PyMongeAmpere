@@ -776,7 +776,7 @@ solve_cholesky(const p::object &ph,
 }
 
 
-BOOST_PYTHON_MODULE(MongeAmperePP)
+BOOST_PYTHON_MODULE(MongeAmpere)
 {
   np::initialize();
   p::class_<Density_2>
