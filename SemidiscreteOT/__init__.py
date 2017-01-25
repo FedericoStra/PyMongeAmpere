@@ -14,10 +14,6 @@
 import sys
 import os
 
-# FIXME: we need to find a nice way to detect the path to MongeAmperePP
-sys.path.append(os.path.dirname(os.path.realpath(__file__)) + '/../lib/');
-sys.path.append('../lib/');
-
 import MongeAmperePP as ma
 import numpy as np
 import numpy.matlib
@@ -52,7 +48,7 @@ class Density_2 (ma.Density_2):
         is provided, the density is uniform on the convex hull of X
         (and vanishes outside this convex hull).
 
-        Args: 
+        Args:
             X(array): input points, described by a Nx2 array
             f(array): values of the density at X, described by a Nx1 array (optional)
             T(array): triangulation of X, described by a Nx3 array of integers,
@@ -66,18 +62,18 @@ class Density_2 (ma.Density_2):
             T = delaunay_2(X)
         self.vertices = X.copy()
         self.triangles = T.copy()
-        self.values = f.copy()            
+        self.values = f.copy()
         ma.Density_2.__init__(self, X,f,T);
 
     @classmethod
     def from_image(cls,im,bbox=None):
-    	"""
-    	This function constructs a density from an image. 
-    	
-    	Args:
-    		im: source image
-    		bbox: box containing the points
-    	"""
+        """
+        This function constructs a density from an image.
+
+        Args:
+            im: source image
+            bbox: box containing the points
+        """
         if bbox is None:
             bbox = [-1,1,-1,1];
         h = im.shape[0];
@@ -109,7 +105,7 @@ class Density_2 (ma.Density_2):
         if w is None:
             w = np.zeros(X.shape[0]);
         return ma.moments_2(self,X,w);
-        
+
 class Periodic_density_2 (ma.Density_2):
     def __init__(self, bbox):
         self.x0 = np.array([bbox[0],bbox[1]]);
@@ -125,7 +121,7 @@ class Periodic_density_2 (ma.Density_2):
 
     def to_fundamental_domain(self,Y):
         N = Y.shape[0];
-        Y = (Y - np.tile(self.x0,(N,1))) / np.tile(self.u,(N,1)); 
+        Y = (Y - np.tile(self.x0,(N,1))) / np.tile(self.u,(N,1));
         Y = Y - np.floor(Y);
         Y = np.tile(self.x0,(N,1)) + Y * np.tile(self.u,(N,1));
         return Y;
@@ -218,14 +214,14 @@ def solve_graph_laplacian(H,g):
 
 def optimal_transport_2(dens, Y, nu, w0 = [0], eps_g=1e-7,
                         maxit=100, verbose=False):
-	# if no initial guess is provided, start with a pre-estimated solution.
-	# Then compute function value, gradient and hessian
+    # if no initial guess is provided, start with a pre-estimated solution.
+    # Then compute function value, gradient and hessian
     N = Y.shape[0];
     if len(w0) == N:
         w = w0;
     else:
         w = np.zeros(N);
-    
+
     [f,m,g,H] = dens.kantorovich(Y, nu, w);
 
     # we impose a minimum weighted area for Laguerre cells during the
@@ -254,7 +250,7 @@ def optimal_transport_2(dens, Y, nu, w0 = [0], eps_g=1e-7,
     # warn the user if the smallest cell has a mass close to zero, as
     # it will likely lead to numerical instabilities.
     if eps0 < 1e-10:
-        print ("optimal_transport_2: minimum cell area is small eps0=%g\n", eps0)
+        print("optimal_transport_2: minimum cell area is small eps0=%g\n" % eps0)
 
     while (np.linalg.norm(g) > eps_g and it <= maxit):
         d = solve_graph_laplacian(H,-g)
@@ -275,7 +271,7 @@ def optimal_transport_2(dens, Y, nu, w0 = [0], eps_g=1e-7,
                 break;
             alpha *= .5;
         if verbose:
-            print ("it %d: f=%g |g|=%g t=%g"
+            print("it %d: f=%g |g|=%g t=%g"
                    % (it, f,np.linalg.norm(g),alpha));
         it = it+1;
     return w
@@ -303,7 +299,7 @@ def laguerre_diagram_to_image(dens, Y, w, colors, bbox, ww, hh):
         raise ValueError("laguerre_diagram_to_image: number of color channels should be 1 or 3")
     return img
 
-        
+
 def to_grayscale(I):
     I8 = np.minimum(255.0*I, 255).astype(np.uint8)
     return Image.fromarray(I8)
@@ -328,7 +324,7 @@ def optimized_sampling_2(dens, N, niter=1,verbose=False):
         N: number of points in the constructed sample
         niter: number of iterations of optimal transport (default: 1)
         verbose: display informations on the iterations
-    
+
     Returns:
         A numpy array with N rows and 2 columns containing the
         coordinates of the optimized sample points.
@@ -336,121 +332,121 @@ def optimized_sampling_2(dens, N, niter=1,verbose=False):
     Y = dens.random_sampling(N);
     nu = np.ones(N);
     nu = (dens.mass() / np.sum(nu)) * nu;
-        
+
     w = np.zeros(N);
     for i in xrange(1,5):
         Y = dens.lloyd(Y, w)[0];
     for i in xrange(0,niter):
         if verbose:
-            print "optimized_sampling, step %d" % (i+1)
+            print("optimized_sampling, step %d" % (i+1))
         w = optimal_transport_2(dens,Y,nu,verbose=verbose);
         Y = dens.lloyd(Y, w)[0];
     return Y
-    
+
 def optimal_transport_presolve_2(Y, X, Y_w=None, X_w=None):
-	"""
-	This function calculates first estimation of the potential.
-	
-	Parameters
-	----------
-	Y : 2D array
-		Target samples
-	Y_w : 1D array
-		Weights associated to Y
-	X : 2D array
-		Source samples
-	X_w : 1D array
-		Weights asociated to X
-		
-	Returns
-	-------
-	psi0 : 1D array
-		Convex estimation of the potential. Its gradient
-		send Y convex hull into X convex hull.	
-	"""
-	
-	if X_w is None:
-		X_w = np.ones(X.shape[0])
-	if Y_w is None:
-		Y_w = np.ones(Y.shape[0])
-	
-	bary_X = np.average(X,axis=0,weights=X_w)
-	bary_Y = np.average(Y,axis=0,weights=Y_w)
-	
-	# Y circum circle radius centered on bary_Y
-	r_Y = furthest_point(Y, bary_Y)
+    """
+    This function calculates first estimation of the potential.
 
-	X_hull = ConvexHull(X)
-	points = X_hull.points
-	simplices = X_hull.simplices
-	
-	# Search of the largest inscribed circle
-	# centered on Y barycentre
-	dmin = distance_point_line(points[simplices[0][0]], points[simplices[0][1]], bary_X)
-	for simplex in simplices:
-		d = distance_point_line(points[simplex[0]], points[simplex[1]], bary_X)
-		if d < dmin:
-			dmin = d
-	# Y inscribed circle radius centered on bary_Y		
-	r_X = dmin
-	
-	ratio = r_X / r_Y
+    Parameters
+    ----------
+    Y : 2D array
+        Target samples
+    Y_w : 1D array
+        Weights associated to Y
+    X : 2D array
+        Source samples
+    X_w : 1D array
+        Weights asociated to X
 
-	psi_tilde0 = 0.5 * ratio * (np.power(Y[:,0]-bary_Y[0],2)+np.power(Y[:,1]-bary_Y[1],2)) + bary_X[0]*(Y[:,0]) + bary_X[1]*(Y[:,1])
+    Returns
+    -------
+    psi0 : 1D array
+        Convex estimation of the potential. Its gradient
+        send Y convex hull into X convex hull.
+    """
 
-	psi0 = np.power(Y[:,0],2) + np.power(Y[:,1],2) - 2*psi_tilde0
-	
-	return psi0
+    if X_w is None:
+        X_w = np.ones(X.shape[0])
+    if Y_w is None:
+        Y_w = np.ones(Y.shape[0])
 
-	
+    bary_X = np.average(X,axis=0,weights=X_w)
+    bary_Y = np.average(Y,axis=0,weights=Y_w)
+
+    # Y circum circle radius centered on bary_Y
+    r_Y = furthest_point(Y, bary_Y)
+
+    X_hull = ConvexHull(X)
+    points = X_hull.points
+    simplices = X_hull.simplices
+
+    # Search of the largest inscribed circle
+    # centered on Y barycentre
+    dmin = distance_point_line(points[simplices[0][0]], points[simplices[0][1]], bary_X)
+    for simplex in simplices:
+        d = distance_point_line(points[simplex[0]], points[simplex[1]], bary_X)
+        if d < dmin:
+            dmin = d
+    # Y inscribed circle radius centered on bary_Y
+    r_X = dmin
+
+    ratio = r_X / r_Y
+
+    psi_tilde0 = 0.5 * ratio * (np.power(Y[:,0]-bary_Y[0],2)+np.power(Y[:,1]-bary_Y[1],2)) + bary_X[0]*(Y[:,0]) + bary_X[1]*(Y[:,1])
+
+    psi0 = np.power(Y[:,0],2) + np.power(Y[:,1],2) - 2*psi_tilde0
+
+    return psi0
+
+
 def distance_point_line(m, n, pt):
-	"""
-	Computes the distance between the line generated 
-	by segment MN and the point pt, in a space of arbitrary
-	dimension dim.
-	
-	Parameters
-	----------
-	m : array (dim,)
-		Point generating the line
-	n : array (dim,)
-		Second point generating the line
-	pt : array (dim,)
-		Point we calculate the distance from the line
-		
-	Returns
-	-------
-	dist : real
-		distance between line (MN) and pt
-	
-	"""
-	u = n - m			# Direction vector
-	Mpt = pt - m
-	norm_u = np.linalg.norm(u)
-	dist = np.linalg.norm(Mpt - (np.inner(Mpt,u)/(norm_u*norm_u))*u)
-	return dist
-		
+    """
+    Computes the distance between the line generated
+    by segment MN and the point pt, in a space of arbitrary
+    dimension dim.
+
+    Parameters
+    ----------
+    m : array (dim,)
+        Point generating the line
+    n : array (dim,)
+        Second point generating the line
+    pt : array (dim,)
+        Point we calculate the distance from the line
+
+    Returns
+    -------
+    dist : real
+        distance between line (MN) and pt
+
+    """
+    u = n - m            # Direction vector
+    Mpt = pt - m
+    norm_u = np.linalg.norm(u)
+    dist = np.linalg.norm(Mpt - (np.inner(Mpt,u)/(norm_u*norm_u))*u)
+    return dist
+
 
 def furthest_point(cloud, a):
-	"""
-	Computes the distance between a and the furthest point
-	in cloud, in a space of arbitrary dimension dim.
-	
-	Parameters
-	----------
-	cloud : (N,dim) array
-		Point cloud
-	a : (,dim) array
-		Point
-	
-	Returns
-	-------
-	distance : real
-		distance between a and the furthest point in cloud.
-	"""
-	assert(a.shape[0] == cloud.shape[1])
-	N = np.shape(cloud)[0]
-	dim = np.shape(cloud)[1]
-	tmp = np.matlib.repmat(a,N,1)
-	dist = np.linalg.norm(tmp-cloud, axis=1)
-	return np.max(dist)
+    """
+    Computes the distance between a and the furthest point
+    in cloud, in a space of arbitrary dimension dim.
+
+    Parameters
+    ----------
+    cloud : (N,dim) array
+        Point cloud
+    a : (,dim) array
+        Point
+
+    Returns
+    -------
+    distance : real
+        distance between a and the furthest point in cloud.
+    """
+    assert(a.shape[0] == cloud.shape[1])
+    N = np.shape(cloud)[0]
+    dim = np.shape(cloud)[1]
+    tmp = np.matlib.repmat(a,N,1)
+    dist = np.linalg.norm(tmp-cloud, axis=1)
+    return np.max(dist)
