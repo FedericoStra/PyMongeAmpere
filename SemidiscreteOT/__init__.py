@@ -14,7 +14,7 @@
 import sys
 import os
 
-import MongeAmperePP as ma
+import MongeAmpere as ma
 import numpy as np
 import numpy.matlib
 import scipy as sp
