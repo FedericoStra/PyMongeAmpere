@@ -17,8 +17,7 @@ def get_ext_modules():
     # Inject required options for extensions compiled against the Numpy
     # C API (include dirs, library dirs etc.)
     compile_args = np_misc.get_info('npymath')
-
-    compile_args['include_dirs'] += ["/usr/include/eigen3/"]
+    # Add other required libraries
     compile_args['libraries'] += ["boost_numpy", "gmp",
         "CGAL", "CGAL_Core", "CGAL_ImageIO"]
 
