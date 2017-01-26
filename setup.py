@@ -1,5 +1,5 @@
 import sys
-from setuptools import setup, Extension
+from setuptools import setup, find_packages, Extension
 
 
 CFLAGS = ["-std=c++11", "-Wall"]
@@ -41,7 +41,7 @@ metadata = dict(
     author_email="federico.stra@sns.it",
     url="http://github.com/FedericoStra/SemidiscreteOT",
 
-    packages=['SemidiscreteOT'],
+    packages=find_packages(),
     ext_modules=get_ext_modules(),
 
     setup_requires=['numpy'],
