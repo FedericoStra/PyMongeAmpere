@@ -11,10 +11,9 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-import sys
-sys.path.append('..');
+from __future__ import print_function
 
-import MongeAmpere as ma
+import SemidiscreteOT as sdot
 import numpy as np
 
 # source: uniform measure on the square with sidelength 2
@@ -22,20 +21,21 @@ X = np.array([[-1,-1],
               [1, -1],
               [1, 1],
               [-1,1]], dtype=float);
-T = ma.delaunay_2(X,np.zeros(4));
-print T
+T = sdot.delaunay_2(X, np.zeros(4));
 mu = np.ones(4)/4;
-dens = ma.Density_2(X,mu,T);
-print "mass=%g"%dens.mass()
+dens = sdot.Density_2(X, mu, T);
 
 # target is a random set of points, with random weights
-N = 1000;
-Y = np.random.rand(N,2)/2;
-nu = 10+np.random.rand(N);
+N = 100;
+Y = np.random.rand(N, 2)*2 - 1;
+nu = 10 + np.random.rand(N);
 nu = (dens.mass() / np.sum(nu)) * nu;
 
 # print "mass(nu) = %f" % sum(nu)
 # print "mass(mu) = %f" % dens.mass()
 
 # 
-ma.optimal_transport_2(dens,Y,nu)
+w = sdot.optimal_transport_2(dens, Y, nu)
+
+print("The potential is:")
+print(w)
