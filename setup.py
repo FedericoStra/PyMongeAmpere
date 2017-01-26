@@ -45,7 +45,7 @@ metadata = dict(
     ext_modules=get_ext_modules(),
 
     setup_requires=['numpy'],
-    install_requires=['numpy'],
+    install_requires=['numpy', 'scipy', 'matplotlib'],
 
     license="GPLv3",
     classifiers=[
