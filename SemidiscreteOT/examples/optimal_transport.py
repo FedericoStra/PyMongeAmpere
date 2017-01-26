@@ -26,7 +26,7 @@ mu = np.ones(4)/4;
 dens = sdot.Density_2(X, mu, T);
 
 # target is a random set of points, with random weights
-N = 100;
+N = 1000;
 Y = np.random.rand(N, 2)*2 - 1;
 nu = 10 + np.random.rand(N);
 nu = (dens.mass() / np.sum(nu)) * nu;
@@ -37,5 +37,15 @@ nu = (dens.mass() / np.sum(nu)) * nu;
 # 
 w = sdot.optimal_transport_2(dens, Y, nu)
 
-print("The potential is:")
-print(w)
+
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
+
+# No need to compute the triangulation associated to Y:
+# it is computed automatically by plot_trisurf().
+# Ytriang = sdot.delaunay_2(Y, np.zeros(N))
+
+fig = plt.figure()
+ax = fig.gca(projection='3d')
+ax.plot_trisurf(Y[:,0], Y[:,1], w, linewidth=0.2)
+plt.show()
