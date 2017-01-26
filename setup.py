@@ -66,4 +66,8 @@ metadata = dict(
         ],
     )
 
-setup(**metadata)
+with open("README.md") as f:
+    metadata['long_description'] = f.read()
+
+if __name__ == '__main__':
+    setup(**metadata)
