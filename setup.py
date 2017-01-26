@@ -47,12 +47,12 @@ metadata = dict(
     setup_requires=['numpy'],
     install_requires=['numpy', 'scipy', 'matplotlib'],
 
-    license="GPLv3",
+    license="GPLv3+",
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
         "Operating System :: MacOS",
         "Operating System :: POSIX",
         "Operating System :: POSIX :: Linux",
