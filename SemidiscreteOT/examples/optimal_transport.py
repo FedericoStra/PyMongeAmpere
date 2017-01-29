@@ -38,7 +38,6 @@ nu = (dens.mass() / np.sum(nu)) * nu;
 # print "mass(nu) = %f" % sum(nu)
 # print "mass(mu) = %f" % dens.mass()
 
-# 
 w = sdot.optimal_transport_2(dens, Y, nu)
 
 

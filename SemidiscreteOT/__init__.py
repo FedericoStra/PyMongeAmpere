@@ -26,6 +26,10 @@ import scipy.optimize as opt
 from scipy.spatial import ConvexHull
 import matplotlib.pyplot as plt
 
+
+__all__ = ["Density_2", "optimal_transport_2"]
+
+
 def delaunay_2(X,w=None):
     if w is None:
         w = np.zeros(X.shape[0]);
@@ -280,38 +284,6 @@ def optimal_transport_2(dens, Y, nu, w0 = [0], eps_g=1e-7,
         it = it+1;
     return w
 
-from PIL import Image
-def to_grayscale(I):
-    I8 = np.minimum(255.0*I, 255).astype(np.uint8)
-    return Image.fromarray(I8)
-def to_rgb(R,G,B):
-    R8 = np.minimum(255.0*R, 255).astype(np.uint8)
-    G8 = np.minimum(255.0*G, 255).astype(np.uint8)
-    B8 = np.minimum(255.0*B, 255).astype(np.uint8)
-    return Image.fromarray(np.dstack((R8,G8,B8)))
-
-def laguerre_diagram_to_image(dens, Y, w, colors, bbox, ww, hh):
-    nc = colors.shape[1]
-    A = ma.rasterize_2(dens, Y, w, colors, bbox[0], bbox[1], bbox[2], bbox[3], ww, hh);
-
-    if (nc == 1):
-        img = to_grayscale(A[0].T)
-        return img
-    elif (nc == 3):
-        img = to_rgb(A[0].T,A[1].T,A[2].T)
-    else:
-        raise ValueError("laguerre_diagram_to_image: number of color channels should be 1 or 3")
-    return img
-
-
-def to_grayscale(I):
-    I8 = np.minimum(255.0*I, 255).astype(np.uint8)
-    return Image.fromarray(I8)
-def to_rgb(R,G,B):
-    R8 = np.minimum(255.0*R, 255).astype(np.uint8)
-    G8 = np.minimum(255.0*G, 255).astype(np.uint8)
-    B8 = np.minimum(255.0*B, 255).astype(np.uint8)
-    return Image.fromarray(np.dstack((R8,G8,B8)))
 
 def optimized_sampling_2(dens, N, niter=1,verbose=False):
     """
