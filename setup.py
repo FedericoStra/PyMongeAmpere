@@ -18,6 +18,10 @@ def get_ext_modules():
     # C API (include dirs, library dirs etc.)
     compile_args = np_misc.get_info('npymath')
     # Add other required libraries
+    if sys.version_info.major == 2:
+        compile_args['libraries'] += ["boost_python"]
+    else:
+        compile_args['libraries'] += ["boost_python3"]
     compile_args['libraries'] += ["boost_numpy", "gmp",
         "CGAL", "CGAL_Core", "CGAL_ImageIO"]
 
