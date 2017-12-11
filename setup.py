@@ -2,7 +2,7 @@ import sys
 from setuptools import setup, find_packages, Extension
 
 
-CFLAGS = ["-std=c++11", "-Wall"]
+CFLAGS = ["-std=c++11", "-Wall", "-O2"]
 
 
 def get_ext_modules():
